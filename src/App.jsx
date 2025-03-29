@@ -16,45 +16,31 @@ Font.register({
 });
 
 const styles = StyleSheet.create({
-  page: { flexDirection: "column", padding: 20 },
+  page: { flexDirection: "column", padding: 10, position: "relative" },
   container: { width: "100%" },
-  arabicText: {
-    fontSize: 14,
-    fontFamily: "Amiri",
-    textAlign: "center",
-    marginBottom: 2,
-  },
-  englishText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 2,
-  },
+  arabicText: { fontSize: 14, fontFamily: "Amiri", textAlign: "center", marginBottom: 2 },
+  englishText: { fontSize: 14, fontWeight: "bold", textAlign: "center", marginBottom: 2 },
   subHeaderText: { fontSize: 8, textAlign: "center", marginBottom: 2 },
 
   // Key-Value Section
-  keyValueContainer: {
-    width: "100%",
-    flexDirection: "row",
-    paddingLeft: 20,
-    marginTop: 10,
-  },
+  keyValueContainer: { width: "100%", flexDirection: "row", paddingLeft: 20, marginTop: 10 },
   column: { width: "50%", flexDirection: "column" },
   keyValueText: { fontSize: 10, textAlign: "left", marginBottom: 2 },
   headerContainer: {
-    flexDirection: "row", // Aligns items in a row (horizontally)
-    alignItems: "center", // Centers items vertically
-    justifyContent: "center", // Centers items horizontally
-    marginBottom: 10, // Adds spacing below the header
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#06134B",
+    color: "white",
+    padding: 10,
   },
+  logoContainer: { flex: 1, alignItems: "flex-start" },
+  titleContainer: { flex: 2, alignItems: "center" },
+
 
   // Table Styles
   tableContainer: { marginTop: 20, borderWidth: 1, borderColor: "#000" },
-  tableRow: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-  },
+  tableRow: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#000" },
   tableHeader: { backgroundColor: "#e4e4e4", fontWeight: "bold" },
   tableCell: {
     fontSize: 8,
@@ -65,6 +51,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   logo: { width: 30, height: 30, marginRight: 5 },
+  footer: {
+    marginTop: "auto", // Pushes footer to the bottom
+    textAlign: "center",
+    padding: 5,
+    borderTopWidth: 1,
+    borderTopColor: "#000",
+  },
+  footerText: {
+    fontSize: 8,
+    textAlign: "center",
+    marginTop: 2,
+  },
 });
 
 // Sample Data
@@ -130,14 +128,20 @@ const data = [
 const MyDocument = () => (
   <Document>
     <Page size="A4" style={styles.page}>
+    <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <Image
-            src={`${window.location.origin}/Images/sangsolution.png`}
-            style={styles.logo}
-          />
-          <Text style={styles.englishText}>VANSALES</Text>
-        </View>
+      <View style={styles.headerContainer}>
+  <View style={styles.logoContainer}>
+    <Image
+      src={`${window.location.origin}/Images/sangsolution.png`}
+      style={styles.logo}
+    />
+  </View>
+  <View style={styles.titleContainer}>
+    <Text style={styles.englishText}>VANSALES</Text>
+  </View>
+</View>
+
 
         <Text style={styles.arabicText}>
           شركة راستي لاري للتجارة العامة ذ.م.م (فرع)
@@ -221,7 +225,18 @@ const MyDocument = () => (
             </View>
           ))}
         </View>
-      </View>
+        </View>
+        </View>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Thank you for your business! For any inquiries, contact us at
+            rasti@rastilari.com
+          </Text>
+          <Text style={styles.footerText}>
+            This is a system-generated invoice. No signature required.
+          </Text>
+        </View>
+    
     </Page>
   </Document>
 );
