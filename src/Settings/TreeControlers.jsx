@@ -1,15 +1,19 @@
+// TreeControlers.js
 import * as React from "react";
 import clsx from "clsx";
 import { styled, useTheme, alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Label from "@mui/icons-material/Label";
-import InfoIcon from "@mui/icons-material/Info";
-import ForumIcon from "@mui/icons-material/Forum";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import TextFieldsIcon from "@mui/icons-material/TextFields";
+import ImageIcon from "@mui/icons-material/Image";
+import GridOnIcon from "@mui/icons-material/GridOn";
+import RectangleIcon from "@mui/icons-material/Rectangle";
+import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
+import TableViewIcon from "@mui/icons-material/TableView";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-
+import { useDrag } from "react-dnd";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import {
   TreeItem2Content,
@@ -21,7 +25,12 @@ import { useTreeItem2 } from "@mui/x-tree-view/useTreeItem2";
 import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider";
 import { TreeItem2Icon } from "@mui/x-tree-view/TreeItem2Icon";
 
-// Styled components
+// Drag item type
+export const ItemTypes = {
+  TREE_ITEM: "tree_item",
+};
+
+// Styled Components
 const CustomTreeItemRoot = styled(TreeItem2Root)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
@@ -54,22 +63,17 @@ const CustomTreeItemGroupTransition = styled(TreeItem2GroupTransition)(() => ({
   },
 }));
 
-// Custom Tree Item Component
+// Draggable TreeItem Component
 const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
-  const theme = useTheme();
   const {
     id,
     itemId,
     label,
     disabled,
     children,
-    bgColor,
-    color,
     labelIcon: LabelIcon,
     labelInfo,
-    colorForDarkMode,
-    bgColorForDarkMode,
-    onSelect,
+    allData,
     ...other
   } = props;
 
@@ -82,53 +86,56 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
     status,
   } = useTreeItem2({ id, itemId, children, label, disabled, rootRef: ref });
 
-  const handleClick = () => {
-    if (onSelect) {
-      onSelect(itemId);
-    }
-  };
+  const [{ isDragging }, dragRef] = useDrag(() => ({
+    type: ItemTypes.TREE_ITEM,
+    item: { ...allData }, // Pass allData
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
 
   return (
     <TreeItem2Provider itemId={itemId}>
       <CustomTreeItemRoot {...getRootProps(other)}>
         <CustomTreeItemContent
+          ref={dragRef} // drag handle
           {...getContentProps({
             className: clsx("content", {
               expanded: status.expanded,
               selected: status.selected,
               focused: status.focused,
             }),
-            onClick: handleClick, // Call on selection
           })}
+          style={{
+            opacity: isDragging ? 0.5 : 1,
+            cursor: "move",
+          }}
         >
           <CustomTreeItemIconContainer {...getIconContainerProps()}>
             <TreeItem2Icon status={status} />
           </CustomTreeItemIconContainer>
-          <Box sx={{ display: "flex", flexGrow: 1, alignItems: "center", p: 0.3, pr: 0 }}>
+          <Box sx={{ display: "flex", flexGrow: 1, alignItems: "center" }}>
             <Box component={LabelIcon} sx={{ fontSize: 18, mr: 1 }} />
             <Typography {...getLabelProps({ variant: "body2", sx: { flexGrow: 1 } })}>
               {label}
             </Typography>
-            {labelInfo && <Typography variant="caption" sx={{ fontSize: "0.75rem" }}>{labelInfo}</Typography>}
+            {labelInfo && (
+              <Typography variant="caption" sx={{ fontSize: "0.75rem" }}>
+                {labelInfo}
+              </Typography>
+            )}
           </Box>
         </CustomTreeItemContent>
-        {children && <CustomTreeItemGroupTransition {...getGroupTransitionProps()} />}
+        {children && (
+          <CustomTreeItemGroupTransition {...getGroupTransitionProps()} />
+        )}
       </CustomTreeItemRoot>
     </TreeItem2Provider>
   );
 });
 
-// End icon for tree items
-function EndIcon() {
-  return <div style={{ width: 20 }} />;
-}
-
-// Tree Control Component
-export default function TreeControlers({ setSelectedController }) {
-  const handleSelect = (itemId) => {
-    setSelectedController(itemId);
-  };
-
+// TreeControlers Component
+export default function TreeControlers() {
   return (
     <SimpleTreeView
       aria-label="tree-view"
@@ -137,7 +144,6 @@ export default function TreeControlers({ setSelectedController }) {
       slots={{
         expandIcon: ArrowRightIcon,
         collapseIcon: ArrowDropDownIcon,
-        endIcon: EndIcon,
       }}
       sx={{
         flexGrow: 1,
@@ -149,21 +155,55 @@ export default function TreeControlers({ setSelectedController }) {
     >
       <CustomTreeItem itemId={0} label="Control" labelIcon={Label}>
         {[
-          { id: 1, label: "Static Test", icon: InfoIcon, color: "#FFE2B7", bgColor: "#ff8f00" },
-          { id: 2, label: "Image", icon: ForumIcon, color: "#D9B8FB", bgColor: "#9035ff" },
-          { id: 3, label: "Body Grid", icon: LocalOfferIcon, color: "#CCE8CD", bgColor: "#64ff6a" },
-          { id: 4, label: "Rectangle", icon: InfoIcon, color: "#FFE2B7", bgColor: "#ff8f00" },
-          { id: 5, label: "Line", icon: ForumIcon, color: "#D9B8FB", bgColor: "#9035ff" },
-          { id: 6, label: "Table", icon: LocalOfferIcon, color: "#CCE8CD", bgColor: "#64ff6a" },
+          {
+            id: 1,
+            label: "Static Text",
+            icon: TextFieldsIcon,
+            bgColor: "#ff8f00",
+            color: "#333333",
+          },
+          {
+            id: 2,
+            label: "Image",
+            icon: ImageIcon,
+            bgColor: "#9035ff",
+            color: "#ffffff",
+          },
+          {
+            id: 3,
+            label: "Body Grid",
+            icon: GridOnIcon,
+            bgColor: "#64ff6a",
+            color: "#000000",
+          },
+          {
+            id: 4,
+            label: "Rectangle",
+            icon: RectangleIcon,
+            bgColor: "#ff8f00",
+            color: "#000000",
+          },
+          {
+            id: 5,
+            label: "Line",
+            icon: HorizontalRuleIcon,
+            bgColor: "#9035ff",
+            color: "#ffffff",
+          },
+          {
+            id: 6,
+            label: "Table",
+            icon: TableViewIcon,
+            bgColor: "#64ff6a",
+            color: "#000000",
+          },
         ].map((item) => (
           <CustomTreeItem
             key={item.id}
             itemId={item.id}
             label={item.label}
             labelIcon={item.icon}
-            colorForDarkMode={item.color}
-            bgColorForDarkMode={alpha(item.bgColor, 0.2)}
-            onSelect={handleSelect} // Pass function
+            allData={item}
           />
         ))}
       </CustomTreeItem>

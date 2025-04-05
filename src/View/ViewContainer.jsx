@@ -1,18 +1,17 @@
 import { colors } from '@mui/material';
 import React from 'react'
 import Page from './Page';
-import ManualAutoComplete from '../components/ManualAutoComplete';
 
   const invoiceContainer1 = {
     width:"60%",
-    backgroundColor: "white",
+    backgroundColor: "gray",
     padding: "10px",
     boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
-    minHeight: "90vh",
-  };
+    height: "90vh",
+  }; 
   
 
-export default function ViewContainer({setPageSize,pageSize}) {
+export default function ViewContainer({pageSize,elements, setElements}) {
   return (
     <div style={invoiceContainer1}>
   <Page pageSize={pageSize}>
