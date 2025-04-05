@@ -1,70 +1,55 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { useDrop } from "react-dnd";
-import { ItemTypes } from "../Settings/TreeControlers";  // Adjust import path accordingly
+import { ItemTypes } from "../Settings/ControlList"; // adjust path as needed
 
-const Page = ({ children, pageSize }) => {
-  const [droppedItems, setDroppedItems] = useState([]);
+const Page = ({ children, pageSize, setElements, elements }) => {
+  const dropZoneRef = useRef(null); // useRef to get DOM rect
 
-  const [{ isOver }, dropRef] = useDrop(() => ({
-    accept: ItemTypes.TREE_ITEM,
+  const [{ isOver }, dropRef] = useDrop({
+    accept: ItemTypes.CONTROL,
     drop: (item, monitor) => {
-      console.log("🔥 Dropped item:", item); // 👈 Your drop data here
-      const clientOffset = monitor.getClientOffset();
-      console.log("📍 Drop position:", clientOffset);
+      const id = crypto.randomUUID();
+      const offset = monitor.getClientOffset();
 
-      setDroppedItems((prev) => [
+      if (!offset || !dropZoneRef.current) return;
+
+      const canvasRect = dropZoneRef.current.getBoundingClientRect();
+
+      const x = offset.x - canvasRect.left;
+      const y = offset.y - canvasRect.top;
+      setElements((prev) => [
         ...prev,
-        {
-          ...item,
-          position: clientOffset,
-        },
+        { iId: id, ...item, position: { x, y } },
       ]);
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
-  }));
+  });
+
+  // Merge refs
+  const combinedRef = (node) => {
+    dropRef(node);
+    dropZoneRef.current = node;
+  };
 
   const a4SheetStyle = {
+    position: "relative", // ⬅️ Required for positioning children absolutely
     width: pageSize?.width > 800 ? 800 : pageSize?.width,
     height: pageSize?.height > 600 ? 600 : pageSize?.height,
-    backgroundColor: isOver ? "#f0f8ff" : "white", // Highlight on hover
+    backgroundColor: "white",
     padding: "20px",
     boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
     margin: "20px auto",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative", // So child elements can be placed using absolute if needed
+    border: isOver ? "2px dashed #1976d2" : "2px dashed transparent",
+    transition: "border 0.2s ease-in-out",
   };
 
   return (
-    <div ref={dropRef} style={a4SheetStyle}>
-      {children}
-      {/* Optionally render dropped items */}
-      {droppedItems.map((el, index) => (
-        <div
-          key={index}
-          style={{
-            position: "absolute",
-            top: el.position?.y - 100 || 0,
-            left: el.position?.x - 200 || 0,
-            padding: "8px 12px",
-            backgroundColor: el.bgColor,
-            color: el.color,
-            borderRadius: "6px",
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-          }}
-        >
-          {el.icon && <el.icon style={{ fontSize: 16 }} />}
-          {el.label}
-        </div>
-      ))}
-    </div>
+    <div ref={combinedRef} style={a4SheetStyle}>
+   
+    {children}
+  </div>
   );
 };
 
