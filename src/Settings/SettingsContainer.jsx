@@ -1,6 +1,7 @@
 import { colors } from '@mui/material';
 import React from 'react'
 import TreeControlers from './TreeControlers';
+import PageProperty from './PageProperty';
 
 const data = [
     {
@@ -92,9 +93,10 @@ const data = [
     borderTop: "1px solid #ddd",
   };
   
-export default function SettingsContainer({setSelectedController}) {
+export default function SettingsContainer({setSelectedController, setPageSize, pageSize}) {
   return (
     <div style={invoiceContainer2}>
+      <PageProperty setPageSize={setPageSize} pageSize={pageSize} />
     <TreeControlers setSelectedController={setSelectedController} />
     <CompanyDetails />
     <Footer />
@@ -102,12 +104,7 @@ export default function SettingsContainer({setSelectedController}) {
   )
 }
 
-const Header = () => (
-    <div style={headerStyle}>
-      <img src="/Images/sangsolution.png" alt="Logo" style={logoStyle} />
-      <h2 style={{ margin: 0 }}>VANSALES</h2>
-    </div>
-  );
+
   
   const CompanyDetails = () => (
     <div style={{ textAlign: "center", margin: "10px 0",  color: "gray", }}>
