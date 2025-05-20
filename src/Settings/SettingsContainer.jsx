@@ -23,7 +23,7 @@ export default function SettingsContainer({ setPageSize, pageSize }) {
     <div style={invoiceContainer2}>
       <PageProperty setPageSize={setPageSize} pageSize={pageSize} />
       <ControlList />
-      <TreeControlers setPageSize={setPageSize} pageSize={pageSize} />
+      {/* <TreeControlers setPageSize={setPageSize} pageSize={pageSize} /> */}
       {pageSize?.control === 1 ? (
         <StaticTextProperties />
       ) : pageSize?.control === 2 ? (
